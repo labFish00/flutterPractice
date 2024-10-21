@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
 import 'poke_list_items.dart';
+import 'settings.dart';
+import 'package:pokemon/utils/theme_mode.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  MyAppState createState() => MyAppState();
+}
+
+class MyAppState extends State<MyApp> {
+  ThemeMode themeMode = ThemeMode.system;
+
+  @override
+  void initState() {
+    super.initState();
+    loadThemeMode().then((val) => setState(() => themeMode = val));
+  }
 
   // This widget is the root of your application.
   @override
@@ -15,7 +30,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
       home: const TopPage(),
     );
   }
@@ -64,22 +79,6 @@ class PokeList extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
       itemCount: 1010,
       itemBuilder: (context, index) => PokeListItem(index: index),
-    );
-  }
-}
-
-class Settings extends StatelessWidget {
-  const Settings({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      children: const [
-        ListTile(
-          leading: Icon(Icons.lightbulb),
-          title: Text('Dark/Light Mode'),
-        ),
-      ],
     );
   }
 }
