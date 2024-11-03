@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pokemon/models/pokemon.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'poke_list_items.dart';
@@ -9,8 +10,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final SharedPreferences pref = await SharedPreferences.getInstance();
   final themeModeNotifier = ThemeModeNotifier(pref);
-  runApp(ChangeNotifierProvider(
-      create: (context) => themeModeNotifier, child: const MyApp()));
+  final pokeMonsNotifier = PokemonsNotifer();
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (context) => themeModeNotifier),
+    ChangeNotifierProvider(create: (context) => pokeMonsNotifier),
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -49,10 +53,8 @@ class TopPageState extends State<TopPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Scaffold(
-        body: SafeArea(
-            child: currentbnb == 0 ? const PokeList() : const Settings()),
-      ),
+      body: SafeArea(
+          child: currentbnb == 0 ? const PokeList() : const Settings()),
       bottomNavigationBar: BottomNavigationBar(
         onTap: (index) => {
           setState(
@@ -70,15 +72,22 @@ class TopPageState extends State<TopPage> {
   }
 }
 
-class PokeList extends StatelessWidget {
+class PokeList extends StatefulWidget {
   const PokeList({super.key});
+  @override
+  PokeListState createState() => PokeListState();
+}
 
+class PokeListState extends State<PokeList> {
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
-      itemCount: 1010,
-      itemBuilder: (context, index) => PokeListItem(index: index),
-    );
+    return Consumer<PokemonsNotifer>(
+        builder: (context, pokes, child) => ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+              itemCount: 10,
+              itemBuilder: (context, index) {
+                return PokeListItem(poke: pokes.byId(index + 1));
+              },
+            ));
   }
 }
